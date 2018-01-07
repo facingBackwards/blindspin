@@ -7,13 +7,14 @@ import itertools
 
 
 class Spinner(object):
-    spinner_cycle = itertools.cycle(u'⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏')
 
-    def __init__(self, beep=False, force=False):
+    def __init__(self, beep=False, force=False, msg=None):
         self.beep = beep
         self.force = force
         self.stop_running = None
         self.spin_thread = None
+        fmt = u' {{}} {}'.format(msg or "").format
+        self.spinner_cycle = itertools.cycle(fmt(c) for c in u'⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏')
 
     def start(self):
         if sys.stdout.isatty() or self.force:
@@ -34,7 +35,8 @@ class Spinner(object):
             sys.stdout.write(next_val)
             sys.stdout.flush()
             time.sleep(0.07)
-            sys.stdout.write('\b')
+            sys.stdout.write('\r')
+        sys.stdout.write('\033[K')
 
     def __enter__(self):
         self.start()
